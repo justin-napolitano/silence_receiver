@@ -1,5 +1,5 @@
 +++
-title = "AirPlay and Spotify on Linux Without PulseAudio (ThinkPad ALC257)"
+title = "Airplay and Spotify with Signal Cancel (ThinkPad ALC257)"
 date = "2025-10-21T15:31:48-05:00"
 description = "Setting up Shairport-Sync, Librespot, and a hum silencer using ALSA only on ThinkPad hardware with Realtek ALC257."
 author = "Justin Napolitano"
