@@ -8,6 +8,7 @@ taxonomies.tags = ["linux","ubuntu","spotify","librespot","alsa","headless","zol
 [extra]
 toc = true
 featured = false
+reaction = false
 +++
 
 ## Goal
