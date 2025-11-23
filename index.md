@@ -1,179 +1,61 @@
-+++
-title = "Airplay and Spotify with Signal Cancel (ThinkPad ALC257)"
-date = "2025-10-21T15:31:48-05:00"
-description = "Setting up Shairport-Sync, Librespot, and a hum silencer using ALSA only on ThinkPad hardware with Realtek ALC257."
-author = "Justin Napolitano"
-categories = ["projects", "audio", "linux"]
-tags = ["alsa", "airplay", "spotify", "thinkpad", "shairport-sync", "librespot"]
-[extra]
-lang = "en"
-toc = true
-featured = false
-reaction = false
-+++
-
-# How I got AirPlay (and Spotify Connect) working on a ThinkPad with **ALSA only**—and killed the idle hum
-
-PulseAudio/pipewire wasn’t cooperating on my ThinkPad (Realtek **ALC257**). I wanted **Shairport-Sync** (AirPlay) and **librespot** (Spotify Connect) to play directly through **ALSA**, _mix_ with each other, and **not** buzz when idle. Here’s the exact setup that finally worked.
-
+---
+slug: "github-silence-receiver"
+title: "silence_receiver"
+repo: "justin-napolitano/silence_receiver"
+githubUrl: "https://github.com/justin-napolitano/silence_receiver"
+generatedAt: "2025-11-23T09:38:25.966396Z"
+source: "github-auto"
 ---
 
-## Hardware & goal
 
-- **Laptop**: ThinkPad T-series  
-- **Codec**: Realtek **ALC257**  
-- **ALSA only** (no PulseAudio/pipewire)  
-- Services:  
-  - **Shairport-Sync** (AirPlay receiver)  
-  - **librespot** (Spotify Connect)  
-  - **Hum silencer** keep-alive so inputs don’t float (no buzz when idle)
+# AirPlay and Spotify Connect on ThinkPad with ALSA Only: A Technical Reference
 
----
+This project addresses the challenge of running AirPlay and Spotify Connect audio streaming on a ThinkPad laptop using ALSA exclusively, without relying on PulseAudio or PipeWire. The motivation stems from compatibility issues and audio quality concerns with PulseAudio/pipewire on certain hardware, specifically the Realtek ALC257 codec found in ThinkPad T-series laptops.
 
-## 1) Create a shared output with **dmix** (system-wide)
+## Problem Statement
 
-ALSA doesn’t mix by default. `dmix` lets multiple apps share the same device. Put this in **`/etc/asound.conf`**:
+PulseAudio and PipeWire, while common in Linux audio stacks, sometimes introduce latency, instability, or hardware compatibility problems. The Realtek ALC257 codec on ThinkPads has exhibited such issues, making it difficult to run Shairport-Sync (AirPlay receiver) and librespot (Spotify Connect client) reliably.
 
-```conf
-# Mix multiple playback clients on Analog (hw:0,0)
-pcm.dmixed_analog {
-  type dmix
-  ipc_key 1024
-  ipc_key_add_uid false   # allow all users/services to share the same segment
-  ipc_perm 0666           # read/write for everyone
-  slave {
-    pcm "hw:0,0"          # ALC257 Analog; verify with `aplay -l`
-    rate 44100            # or 48000 if your card prefers it
-    format S16_LE
-    channels 2
-    period_time 0
-    period_size 1024
-    buffer_size 8192
-  }
-}
+Additionally, ALSA by itself does not natively mix multiple audio streams, which is required to have both AirPlay and Spotify Connect outputs playing simultaneously. Another common problem is an audible idle hum when no audio is playing, caused by floating inputs in the codec.
 
-# Route default through dmix (with automatic format conversion)
-pcm.!default {
-  type plug
-  slave.pcm "dmixed_analog"
-}
+## Solution Overview
 
-ctl.!default {
-  type hw
-  card 0
-}
-```
+The approach uses ALSA's `dmix` plugin to create a system-wide shared output device that mixes audio streams from multiple clients. This allows Shairport-Sync and librespot to output through the same ALSA device concurrently.
 
-> If your card is not `hw:0,0`, change both the `pcm "hw:X,Y"` and `card` lines accordingly (`aplay -l` shows the indexes).  
-> If you switch to 48 kHz later, update **all** commands/services to match that rate.
+To eliminate the idle hum, a small shell script plays a silent audio tone after AirPlay disconnects, keeping the audio input active and preventing floating signals.
 
----
+## Implementation Details
 
-## 2) Add a **hum silencer** keep-alive (systemd, ALSA only)
+### ALSA Configuration
 
-Many receivers hum when the source goes idle (the DAC output “floats”). We keep the device **lightly busy** with a near-zero signal so the analog stage stays biased.
+The core of the solution is the `/etc/asound.conf` file defining a `dmixed_analog` PCM device:
 
-A robust service is a SoX→aplay pipe (SoX generates, aplay talks to ALSA):
+- Uses `dmix` type with IPC keys and permissions set to allow all users and services to access the shared segment.
+- Targets the hardware device `hw:0,0` representing the analog output of the Realtek ALC257.
+- Sets parameters such as sample rate (44100 Hz), format (S16_LE), channels (2), and buffer sizes optimized for low latency and stability.
+- Overrides the default PCM to route through this dmix device, enabling seamless mixing.
 
-**`/etc/systemd/system/alsa-keepalive.service`**
-```ini
-[Unit]
-Description=Keep ALSA output active to prevent hum (sox->aplay)
-After=sound.target
-Wants=sound.target
-StartLimitIntervalSec=0
+### Hum Silencer Script
 
-[Service]
-ExecStart=/bin/bash -lc '/usr/bin/sox -q -r 44100 -c 2 -b 16 -e signed-integer -n -t raw - synth 0 pinknoise vol 0.0006 | /usr/bin/aplay -q -D default -f S16_LE -c 2 -r 44100'
-Restart=always
-RestartSec=2
-Nice=10
+The `stop-hum.sh` script is a simple Bash script that:
 
-[Install]
-WantedBy=multi-user.target
-```
+- Waits 2 seconds (to allow any disconnect events to settle).
+- Plays a silent WAV file (`silence.wav`) located in the user's Music directory using `aplay` in quiet mode.
 
-Enable it:
-```bash
-sudo systemctl daemon-reload
-sudo systemctl enable --now alsa-keepalive.service
-```
+This keeps the codec inputs active and prevents the characteristic idle hum.
 
-_Alternative_: if you prefer a sub-bass tone that’s usually inaudible:
-```bash
-... synth 0 sine 40 vol 0.001 | aplay ...
-```
+### Integration
 
----
+Shairport-Sync and librespot are configured to output to the ALSA default device, which is now the dmix-enabled device. The hum silencer script can be triggered manually or integrated into disconnect event hooks.
 
-## 3) Configure **Shairport-Sync** to use `default` (dmix), not `hw:0,0`
+## Practical Considerations
 
-Depending on how you installed it, your config is either `/etc/shairport-sync.conf` or `/usr/local/etc/shairport-sync.conf`. Mine was `/usr/local/etc/shairport-sync.conf`.
+- The ALSA device name `hw:0,0` may vary; users should verify with `aplay -l`.
+- The silent tone file must be a valid WAV file of silence; creating or sourcing this file is necessary.
+- This setup assumes a Linux environment with ALSA and the relevant audio clients installed.
 
-**Minimal working config**:
+## Summary
 
-```conf
-general = {
-  name = "Tulip Speaker";
-  mdns_backend = "avahi";
-  log_verbosity = 2;
-  output_backend = "alsa";
-};
+This project provides a practical, low-level audio configuration for Linux users on ThinkPads with Realtek ALC257 codecs who require stable AirPlay and Spotify Connect streaming without the overhead or issues of PulseAudio or PipeWire. It leverages ALSA's dmix for mixing and a simple shell script to suppress idle hum, enabling a clean and reliable audio experience.
 
-alsa = {
-  output_device = "default";       # use dmix, not hw
-  use_mmap = "no";                 # safer on some Intel HDA
-  output_format = "S16";
-  output_rate = 44100;             # match /etc/asound.conf
-  mixer_control_name = "Headphone";# pick a control that exists on your card
-  mixer_device = "hw:0";
-};
-```
-
-Restart and verify logs reference **`default`** (not `plughw:0,0`):
-```bash
-sudo systemctl restart shairport-sync
-sudo journalctl -u shairport-sync -b | grep -E 'output device name|PCM handle name'
-```
-
----
-
-## 4) Configure **librespot** (Spotify Connect) for ALSA + hardware mixer
-
-**`/etc/systemd/system/librespot.service`**
-```ini
-[Unit]
-Description=Spotify Connect (librespot)
-After=network-online.target sound.target
-Wants=network-online.target
-
-[Service]
-User=spotify
-Group=audio
-WorkingDirectory=/var/lib/librespot
-
-ExecStart=/usr/local/bin/librespot   -n "Jaybird's Jam"   -B alsa   -d default   -m alsa   -S hw:0   -T "Headphone"   -b 160   -G   -C /var/lib/librespot   -z 8765   -i 192.168.1.115   -v
-
-Restart=always
-RestartSec=5
-NoNewPrivileges=true
-
-[Install]
-WantedBy=multi-user.target
-```
-
----
-
-## 5) Verify
-
-- `aplay -D default -f S16_LE -r 44100 /usr/share/sounds/alsa/Front_Center.wav` plays.  
-- `systemctl status alsa-keepalive` → running (no hum when idle).  
-- AirPlay + Spotify play together without “device busy”.  
-- Mixer control (`Headphone`) adjusts volume correctly.
-
----
-
-### Final note
-
-This configuration keeps the setup **pure ALSA**—no PulseAudio, no PipeWire.  
-Everything shares the same `default` dmix sink, stays silent when idle, and your ThinkPad’s analog output finally behaves like proper audio gear.
+The documentation and scripts serve as a reference for future maintenance or adaptation to similar hardware and use cases.
