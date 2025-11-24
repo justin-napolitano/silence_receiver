@@ -21,6 +21,13 @@ seoSecondaryKeywords:
   - hum silencer script
   - Realtek ALC257 Linux audio
 seoOptimized: true
+topicFamily: devtools
+topicFamilyConfidence: 0.95
+topicFamilyNotes: >-
+  The post is focused on configuring and troubleshooting a Linux audio environment on a ThinkPad,
+  specifically ALSA setup and custom scripts for audio hum suppression — a topic closely aligned
+  with development environment configuration and tooling. It covers shell scripting, hardware
+  configuration, and Linux system details, fitting the 'Devtools' category best.
 ---
 
 # AirPlay and Spotify Connect on ThinkPad with ALSA Only: A Technical Reference
@@ -74,3 +81,4 @@ Shairport-Sync and librespot are configured to output to the ALSA default device
 This project provides a practical, low-level audio configuration for Linux users on ThinkPads with Realtek ALC257 codecs who require stable AirPlay and Spotify Connect streaming without the overhead or issues of PulseAudio or PipeWire. It leverages ALSA's dmix for mixing and a simple shell script to suppress idle hum, enabling a clean and reliable audio experience.
 
 The documentation and scripts serve as a reference for future maintenance or adaptation to similar hardware and use cases.
+
