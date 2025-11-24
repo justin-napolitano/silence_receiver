@@ -1,12 +1,27 @@
 ---
-slug: "github-silence-receiver"
-title: "silence_receiver"
-repo: "justin-napolitano/silence_receiver"
-githubUrl: "https://github.com/justin-napolitano/silence_receiver"
-generatedAt: "2025-11-23T09:38:25.966396Z"
-source: "github-auto"
+slug: github-silence-receiver
+title: AirPlay and Spotify Connect on ThinkPad Using ALSA with Hum Suppression
+repo: justin-napolitano/silence_receiver
+githubUrl: https://github.com/justin-napolitano/silence_receiver
+generatedAt: '2025-11-23T09:38:25.966396Z'
+source: github-auto
+summary: >-
+  Configuration details for running AirPlay and Spotify Connect simultaneously on ThinkPad with
+  ALSA, including dmix setup and hum silencer script.
+tags:
+  - alsa
+  - thinkpad
+  - airplay
+  - spotify-connect
+  - linux-audio
+  - dmix
+seoPrimaryKeyword: ALSA AirPlay Spotify Connect ThinkPad
+seoSecondaryKeywords:
+  - dmix configuration
+  - hum silencer script
+  - Realtek ALC257 Linux audio
+seoOptimized: true
 ---
-
 
 # AirPlay and Spotify Connect on ThinkPad with ALSA Only: A Technical Reference
 
