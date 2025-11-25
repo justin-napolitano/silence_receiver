@@ -1,19 +1,30 @@
 ---
 slug: github-silence-receiver
 id: github-silence-receiver
-title: silence_receiver
+title: AirPlay and Spotify Connect on ThinkPad with ALSA
 repo: justin-napolitano/silence_receiver
 githubUrl: https://github.com/justin-napolitano/silence_receiver
 generatedAt: '2025-11-24T21:36:23.110Z'
 source: github-auto
 summary: >-
-  A minimal shell-based setup to enable AirPlay and Spotify Connect on ThinkPad
-  laptops using ALSA only, avoiding PulseAudio or PipeWire. Includes a hum
-  silencer script to eliminate idle audio noise.
-tags: []
-seoPrimaryKeyword: ''
-seoSecondaryKeywords: []
-seoOptimized: false
+  Set up a minimal shell-based AirPlay and Spotify Connect receiver on ThinkPad
+  laptops using ALSA, including a hum silencer script.
+tags:
+  - alsa
+  - shairport-sync
+  - librespot
+  - bash
+  - audio
+  - linux
+  - thinkpad
+seoPrimaryKeyword: thinkpad airplay spotify connect
+seoSecondaryKeywords:
+  - alsa audio handling
+  - hum silencer script
+  - shairport-sync setup
+  - librespot installation
+  - dmix configuration
+seoOptimized: true
 topicFamily: null
 topicFamilyConfidence: null
 kind: project
