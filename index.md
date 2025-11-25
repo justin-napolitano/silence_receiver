@@ -1,13 +1,13 @@
 ---
 slug: github-silence-receiver
-title: AirPlay and Spotify Connect on ThinkPad Using ALSA with Hum Suppression
+title: AirPlay and Spotify Connect on ThinkPad with ALSA
 repo: justin-napolitano/silence_receiver
 githubUrl: https://github.com/justin-napolitano/silence_receiver
 generatedAt: '2025-11-23T09:38:25.966396Z'
 source: github-auto
 summary: >-
-  Configuration details for running AirPlay and Spotify Connect simultaneously on ThinkPad with
-  ALSA, including dmix setup and hum silencer script.
+  This guide details configuring ALSA for AirPlay and Spotify Connect on
+  ThinkPads, addressing audio mixing and idle hum issues.
 tags:
   - alsa
   - thinkpad
@@ -15,19 +15,28 @@ tags:
   - spotify-connect
   - linux-audio
   - dmix
-seoPrimaryKeyword: ALSA AirPlay Spotify Connect ThinkPad
+  - shairport-sync
+  - librespot
+  - audio streaming
+  - linux
+seoPrimaryKeyword: alsa airplay spotify connect thinkpad
 seoSecondaryKeywords:
-  - dmix configuration
+  - realtek alc257 codec
+  - linux audio configuration
   - hum silencer script
-  - Realtek ALC257 Linux audio
+  - audio mixing
+  - shairport-sync configuration
 seoOptimized: true
 topicFamily: devtools
 topicFamilyConfidence: 0.95
 topicFamilyNotes: >-
-  The post is focused on configuring and troubleshooting a Linux audio environment on a ThinkPad,
-  specifically ALSA setup and custom scripts for audio hum suppression — a topic closely aligned
-  with development environment configuration and tooling. It covers shell scripting, hardware
-  configuration, and Linux system details, fitting the 'Devtools' category best.
+  The post is focused on configuring and troubleshooting a Linux audio
+  environment on a ThinkPad, specifically ALSA setup and custom scripts for
+  audio hum suppression — a topic closely aligned with development environment
+  configuration and tooling. It covers shell scripting, hardware configuration,
+  and Linux system details, fitting the 'Devtools' category best.
+kind: project
+id: github-silence-receiver
 ---
 
 # AirPlay and Spotify Connect on ThinkPad with ALSA Only: A Technical Reference
