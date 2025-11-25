@@ -7,8 +7,8 @@ githubUrl: https://github.com/justin-napolitano/silence_receiver
 generatedAt: '2025-11-24T21:36:23.110Z'
 source: github-auto
 summary: >-
-  Set up a minimal shell-based AirPlay and Spotify Connect receiver on ThinkPad
-  laptops using ALSA, including a hum silencer script.
+  Set up a minimal shell-based AirPlay and Spotify Connect receiver on ThinkPad laptops using ALSA,
+  including a hum silencer script.
 tags:
   - alsa
   - shairport-sync
@@ -25,8 +25,8 @@ seoSecondaryKeywords:
   - librespot installation
   - dmix configuration
 seoOptimized: true
-topicFamily: null
-topicFamilyConfidence: null
+topicFamily: devtools
+topicFamilyConfidence: 0.9
 kind: project
 entryLayout: project
 showInProjects: true
@@ -129,4 +129,5 @@ Adjust `hw:0,0` if your sound card differs.
 - Integrate librespot and Shairport-Sync service management
 - Provide packaged installer or systemd service files
 - Add detailed troubleshooting and configuration guides
+
 
